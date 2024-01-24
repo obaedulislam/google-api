@@ -31,37 +31,82 @@ export class LocationSearchComponent implements OnInit {
     };
   }
 
+  // initializeAutocomplete() {
+  //   this.zone.run(() => {
+  //     const searchField = new google.maps.places.Autocomplete(
+  //       document.getElementById('search_input') as HTMLInputElement,
+  //       {
+  //         types: ['geocode'],
+  //         bounds: this.createBounds()
+  //       }
+  //     );
+
+  //     // // Set the bounds after the Autocomplete is created
+  //     // searchField.setBounds(this.createBounds());
+
+
+  //     google.maps.event.addListener(searchField, 'place_changed', () => {
+  //       const nearPlace = searchField.getPlace();
+  //       console.log(nearPlace);
+  //       // Search address show
+  //       const myLatlng = nearPlace.geometry.location;
+  //       const mapOptions = {
+  //         zoom: 15,
+  //         center: myLatlng
+  //       };
+  //       const map = new google.maps.Map(this.gmapElement.nativeElement, mapOptions);
+  //       const marker = new google.maps.Marker({
+  //         position: myLatlng,
+  //         title: nearPlace.name
+  //       });
+  //       marker.setMap(map);
+  //     });
+  //   });
+  // }
+
   initializeAutocomplete() {
     this.zone.run(() => {
-      const searchField = new google.maps.places.Autocomplete(
-        document.getElementById('search_input') as HTMLInputElement,
-        {
-          types: ['geocode'],
-          bounds: this.createBounds()
-        }
-      );
+      console.log(navigator.geolocation);
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition((position) => {
+          const myLatlng = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          };
 
-      // // Set the bounds after the Autocomplete is created
-      // searchField.setBounds(this.createBounds());
+          const mapOptions = {
+            zoom: 15,
+            center: myLatlng
+          };
 
+          const map = new google.maps.Map(this.gmapElement.nativeElement, mapOptions);
 
-      google.maps.event.addListener(searchField, 'place_changed', () => {
-        const nearPlace = searchField.getPlace();
-        console.log(nearPlace);
-        const myLatlng = nearPlace.geometry.location;
-        const mapOptions = {
-          zoom: 15,
-          center: myLatlng
-        };
-        const map = new google.maps.Map(this.gmapElement.nativeElement, mapOptions);
-        const marker = new google.maps.Marker({
-          position: myLatlng,
-          title: nearPlace.name
+          const searchField = new google.maps.places.Autocomplete(
+            document.getElementById('search_input') as HTMLInputElement,
+            {
+              types: ['geocode'],
+              bounds: this.createBounds()
+            }
+          );
+
+          google.maps.event.addListener(searchField, 'place_changed', () => {
+            const nearPlace = searchField.getPlace();
+            console.log(nearPlace);
+
+            map.setCenter(nearPlace.geometry.location);
+
+            const marker = new google.maps.Marker({
+              position: nearPlace.geometry.location,
+              title: nearPlace.name
+            });
+
+            marker.setMap(map);
+          });
         });
-        marker.setMap(map);
-      });
+      }
     });
   }
+
 
   getCurrentLocation() {
     if (navigator.geolocation) {
