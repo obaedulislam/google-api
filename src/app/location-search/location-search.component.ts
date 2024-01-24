@@ -1,8 +1,7 @@
 import { Component, OnInit, NgZone, ViewChild } from '@angular/core';
-declare var google: any;// 
-// import * as google from 'googlemaps';
 
-// import { google } from 'googlemaps';
+declare var google: any;
+
 @Component({
   selector: 'app-location-search',
   templateUrl: './location-search.component.html',
@@ -10,8 +9,7 @@ declare var google: any;//
 })
 export class LocationSearchComponent implements OnInit {
   @ViewChild('gmap') gmapElement: any;
-  searchInputValue!: string;
-  currentLocation!: { lat: number, lng: number };
+  currentLocation: { lat: number, lng: number } | undefined;
   currentLocationName!: string;
 
   constructor(private zone: NgZone) { }
@@ -31,29 +29,27 @@ export class LocationSearchComponent implements OnInit {
     };
   }
 
-
   initializeAutocomplete() {
     this.zone.run(() => {
-      console.log(navigator.geolocation);
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition((position) => {
-          const myLatlng = {
+          this.currentLocation = {
             lat: position.coords.latitude,
             lng: position.coords.longitude
           };
 
           const mapOptions = {
             zoom: 15,
-            center: myLatlng
+            center: this.currentLocation
           };
 
           const map = new google.maps.Map(this.gmapElement.nativeElement, mapOptions);
 
-          const searchInput = document.getElementById('pick-up') as HTMLInputElement;
+          const pickUpInput = document.getElementById('pick-up') as HTMLInputElement;
           const dropOffInput = document.getElementById('drop-off') as HTMLInputElement;
 
-          const searchField = new google.maps.places.Autocomplete(
-            searchInput,
+          const pickUpField = new google.maps.places.Autocomplete(
+            pickUpInput,
             {
               types: ['geocode'],
               bounds: this.createBounds()
@@ -68,31 +64,32 @@ export class LocationSearchComponent implements OnInit {
             }
           );
 
-          google.maps.event.addListener(searchField, 'place_changed', () => {
-            const nearPlace = searchField.getPlace();
-            console.log(nearPlace);
+          google.maps.event.addListener(pickUpField, 'place_changed', () => {
+            const pickUpPlace = pickUpField.getPlace();
+            console.log(pickUpPlace);
 
-            map.setCenter(nearPlace.geometry.location);
+            map.setCenter(pickUpPlace.geometry.location);
 
             const marker = new google.maps.Marker({
-              position: nearPlace.geometry.location,
-              title: nearPlace.name
+              position: pickUpPlace.geometry.location,
+              title: pickUpPlace.name
             });
 
             marker.setMap(map);
 
-            dropOffField.setBounds(searchField.getBounds());
+            if (this.currentLocation) {
+              dropOffField.setBounds(this.createBounds(pickUpPlace.geometry.location));
+            }
           });
 
           google.maps.event.addListener(dropOffField, 'place_changed', () => {
-            const nearPlace = dropOffField.getPlace();
-            console.log('Drop-off location:', nearPlace);
+            const dropOffPlace = dropOffField.getPlace();
+            console.log('Drop-off location:', dropOffPlace);
           });
         });
       }
     });
   }
-
 
   getCurrentLocation() {
     if (navigator.geolocation) {
@@ -126,7 +123,7 @@ export class LocationSearchComponent implements OnInit {
   }
 
   getLocationName(lat: number, lng: number) {
-    if (google == undefined && google.maps && google.maps.Geocoder) {
+    if (google && google.maps && google.maps.Geocoder) {
       const geocoder = new google.maps.Geocoder();
       const latlng = new google.maps.LatLng(lat, lng);
 
@@ -149,14 +146,12 @@ export class LocationSearchComponent implements OnInit {
     }
   }
 
-  createBounds(): any {
-    const radius = 1000; // Specify the radius in meters
-    const bounds = new google.maps.LatLngBounds();
-
-    bounds.extend(new google.maps.LatLng(this.currentLocation?.lat + (radius / 111000), this.currentLocation?.lng + (radius / (111000 * Math.cos(this.currentLocation?.lat * Math.PI / 180)))));
-    bounds.extend(new google.maps.LatLng(this.currentLocation?.lat - (radius / 111000), this.currentLocation?.lng - (radius / (111000 * Math.cos(this.currentLocation?.lat * Math.PI / 180)))));
-
-    return bounds;
+  createBounds(center?: { lat: number, lng: number }): any {
+    if (center) {
+      const radius = 5000; // Specify the radius in meters
+      const bounds = new google.maps.Circle({ center, radius }).getBounds();
+      return bounds;
+    }
+    return null;
   }
-
 }
