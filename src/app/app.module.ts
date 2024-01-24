@@ -12,7 +12,7 @@ import { LocationSearchComponent } from './location-search/location-search.compo
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    AppRoutingModule,
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -1,4 +1,4 @@
-import { Component, OnInit, NgZone } from '@angular/core';
+import { Component, OnInit, NgZone, ViewChild } from '@angular/core';
 declare var google: any;// 
 // import * as google from 'googlemaps';
 
@@ -9,6 +9,7 @@ declare var google: any;//
   styleUrls: ['./location-search.component.scss']
 })
 export class LocationSearchComponent implements OnInit {
+  @ViewChild('gmap') gmapElement: any;
   searchInputValue!: string;
   currentLocation!: { lat: number, lng: number };
   currentLocationName!: string;
@@ -47,6 +48,17 @@ export class LocationSearchComponent implements OnInit {
       google.maps.event.addListener(searchField, 'place_changed', () => {
         const nearPlace = searchField.getPlace();
         console.log(nearPlace);
+        const myLatlng = nearPlace.geometry.location;
+        const mapOptions = {
+          zoom: 15,
+          center: myLatlng
+        };
+        const map = new google.maps.Map(this.gmapElement.nativeElement, mapOptions);
+        const marker = new google.maps.Marker({
+          position: myLatlng,
+          title: nearPlace.name
+        });
+        marker.setMap(map);
       });
     });
   }
