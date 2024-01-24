@@ -12,6 +12,17 @@ export class LocationSearchComponent implements OnInit {
   currentLocation: { lat: number, lng: number } | undefined;
   currentLocationName!: string;
 
+  inputFields = [
+    {
+      id: "pick-up",
+      placeholder: "Pickup Location",
+    },
+    {
+      id: "drop-off",
+      placeholder: "Drop Off Location",
+    }
+  ]
+
   constructor(private zone: NgZone) { }
 
   ngOnInit(): void {
