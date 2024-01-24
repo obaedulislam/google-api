@@ -2,14 +2,20 @@
     <div class="container">
         <div class="row py-5">
             <div class="col-6">
-                <h2 class="text-start text-white">Google Map Search Autocomplete</h2>
+                <h2 class="text-start text-white">Search <span class="text-info">Pickup</span> Location:</h2>
                 <div class="form-group">
-                    <input type="text" class="form-control" id="search_input" placeholder="Type address..." />
+                    <input type="text" class="form-control" id="pick-up" placeholder="Type address..." />
+                </div>
+
+
+                <h2 class="text-start text-white mt-5">Search <span class="text-info">Drop-Off</span> Location:</h2>
+                <div class="form-group">
+                    <input type="text" class="form-control" id="drop-off" placeholder="Type address..." />
                 </div>
             </div>
             <div class="col-6">
                 <div class="map-view">
-                    <div #gmap style="width:600px;height:450px">
+                    <div #gmap style="width:600px;height:450px; border-radius: 15px;">
                     </div>
                 </div>
             </div>

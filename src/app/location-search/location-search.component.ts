@@ -31,38 +31,6 @@ export class LocationSearchComponent implements OnInit {
     };
   }
 
-  // initializeAutocomplete() {
-  //   this.zone.run(() => {
-  //     const searchField = new google.maps.places.Autocomplete(
-  //       document.getElementById('search_input') as HTMLInputElement,
-  //       {
-  //         types: ['geocode'],
-  //         bounds: this.createBounds()
-  //       }
-  //     );
-
-  //     // // Set the bounds after the Autocomplete is created
-  //     // searchField.setBounds(this.createBounds());
-
-
-  //     google.maps.event.addListener(searchField, 'place_changed', () => {
-  //       const nearPlace = searchField.getPlace();
-  //       console.log(nearPlace);
-  //       // Search address show
-  //       const myLatlng = nearPlace.geometry.location;
-  //       const mapOptions = {
-  //         zoom: 15,
-  //         center: myLatlng
-  //       };
-  //       const map = new google.maps.Map(this.gmapElement.nativeElement, mapOptions);
-  //       const marker = new google.maps.Marker({
-  //         position: myLatlng,
-  //         title: nearPlace.name
-  //       });
-  //       marker.setMap(map);
-  //     });
-  //   });
-  // }
 
   initializeAutocomplete() {
     this.zone.run(() => {
@@ -81,8 +49,19 @@ export class LocationSearchComponent implements OnInit {
 
           const map = new google.maps.Map(this.gmapElement.nativeElement, mapOptions);
 
+          const searchInput = document.getElementById('pick-up') as HTMLInputElement;
+          const dropOffInput = document.getElementById('drop-off') as HTMLInputElement;
+
           const searchField = new google.maps.places.Autocomplete(
-            document.getElementById('search_input') as HTMLInputElement,
+            searchInput,
+            {
+              types: ['geocode'],
+              bounds: this.createBounds()
+            }
+          );
+
+          const dropOffField = new google.maps.places.Autocomplete(
+            dropOffInput,
             {
               types: ['geocode'],
               bounds: this.createBounds()
@@ -101,6 +80,13 @@ export class LocationSearchComponent implements OnInit {
             });
 
             marker.setMap(map);
+
+            dropOffField.setBounds(searchField.getBounds());
+          });
+
+          google.maps.event.addListener(dropOffField, 'place_changed', () => {
+            const nearPlace = dropOffField.getPlace();
+            console.log('Drop-off location:', nearPlace);
           });
         });
       }
