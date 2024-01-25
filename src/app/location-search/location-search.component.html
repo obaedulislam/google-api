@@ -7,6 +7,12 @@
                     <input type="text" class="form-control input-field-{{ i }}" [id]="field.id"
                         [placeholder]="field.placeholder" />
                 </div>
+                <div class="add-input">
+                    <span>
+                        <img src="../../assets/images/plus.svg" alt="plus" (click)="addInputField()">
+                        <img src="../../assets/images/minus.svg" alt="minus" (click)="removeInputField()">
+                    </span>
+                </div>
             </div>
             <div class="col-6">
                 <div class="map-view">

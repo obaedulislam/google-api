@@ -157,9 +157,24 @@ export class LocationSearchComponent implements OnInit {
     }
   }
 
+  addInputField() {
+    const newIndex = this.inputFields.length;
+    const newField = {
+      id: `stop-${newIndex}`,
+      placeholder: `Stop location `,
+    };
+    this.inputFields.push(newField);
+  }
+
+  removeInputField() {
+    if (this.inputFields.length > 2) {
+      this.inputFields.pop();
+    }
+  }
+
   createBounds(center?: { lat: number, lng: number }): any {
     if (center) {
-      const radius = 5000; // Specify the radius in meters
+      const radius = 5000;
       const bounds = new google.maps.Circle({ center, radius }).getBounds();
       return bounds;
     }
